@@ -1,16 +1,32 @@
+"use client"
+
 import { Compass } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useState } from "react"
+import { LoginFormProps } from "@/lib/types"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+
+  const [formData, setFormData] = useState<LoginFormProps>({
+    email: "",
+    password: "",
+  })
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    console.log("Form submitted:", formData);
+  }
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <form>
+      <form onSubmit={handleSubmit}>
         <div className="flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2">
             <a
@@ -37,7 +53,11 @@ export function LoginForm({
                 id="email"
                 type="email"
                 placeholder="m@example.com"
-                required
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value})}
+                autoComplete="email"
+                autoFocus
+                required 
               />
             </div>
             <div className="grid gap-3">
@@ -45,6 +65,8 @@ export function LoginForm({
               <Input
                 id="password"
                 type="password"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value})}
                 required
               />
             </div>

@@ -1,17 +1,40 @@
+"use client"
+
 import { Compass } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { signupSchema } from "@/schemas/signupSchema"
+import { useState } from "react"
+import { SignUpFormProps } from "@/lib/types"
 
 export function SignUpForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+
+  const [formData, setFormData] = useState<SignUpFormProps>({
+      email: "",
+      password: "",
+      passwordConfirm: "",
+    })
+
+  const handleRegister = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    const result = signupSchema.safeParse(FormData);
+
+
+    console.log("Form submitted:", result);
+    console.log("Form data:", formData);
+
+  }
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <form>
+      <form onSubmit={handleRegister}>
         <div className="flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2">
             <a
@@ -38,6 +61,8 @@ export function SignUpForm({
                 id="email"
                 type="email"
                 placeholder="m@example.com"
+                value={formData.email}
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
                 required
               />
             </div>
@@ -46,6 +71,8 @@ export function SignUpForm({
               <Input
                 id="password"
                 type="password"
+                value={formData.password}
+                onChange={(e) => setFormData({...formData, password: e.target.value})}
                 required
               />
             </div>
@@ -54,11 +81,13 @@ export function SignUpForm({
               <Input
                 id="confirm-password"
                 type="password"
+                value={formData.passwordConfirm}
+                onChange={(e) => setFormData({...formData, passwordConfirm: e.target.value})}
                 required
               />
             </div>
             <Button type="submit" className="w-full cursor-pointer">
-              Login
+              Register
             </Button>
           </div>
           <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
