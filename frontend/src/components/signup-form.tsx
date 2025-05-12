@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { signupSchema } from "@/schemas/signupSchema"
 import { useState } from "react"
-import { SignUpFormProps } from "@/lib/types"
+import { SignUpFormProps, SignUpFormErrorProps } from "@/lib/types"
+import { EyeOff, Eye, LoaderCircle } from "lucide-react"
 
 export function SignUpForm({
   className,
@@ -16,20 +17,44 @@ export function SignUpForm({
 }: React.ComponentProps<"div">) {
 
   const [formData, setFormData] = useState<SignUpFormProps>({
-      email: "",
-      password: "",
-      passwordConfirm: "",
-    })
+    email: "",
+    password: "",
+    passwordConfirm: "",
+  })
+
+  const [formDataError, setFormDataError] = useState<SignUpFormErrorProps>({
+    emailError: "",
+    passwordError: "",
+    passwordConfirmError: "",
+  });
+
+  const [showPassword, setShowPassword] = useState({
+    password: false,
+    passwordConfirm: false,
+  });
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault()
+    setIsLoading(true);
 
-    const result = signupSchema.safeParse(FormData);
+    const result = signupSchema.safeParse(formData);
 
+    if(!result.success){
+      const formattedErrors = result.error.format();
 
-    console.log("Form submitted:", result);
-    console.log("Form data:", formData);
+      setFormDataError((prev) => ({
+        ...prev,
+        emailError: formattedErrors.email?._errors?.join(" ") || "",
+        passwordError: formattedErrors.password?._errors?.join(" ") || "",
+        passwordConfirmError: formattedErrors.passwordConfirm?._errors?.join(" ") || "",
+      }));
+    }
 
+    setTimeout(() => {
+      setIsLoading(false)
+    }, 2000)
   }
 
   return (
@@ -65,29 +90,67 @@ export function SignUpForm({
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
                 required
               />
+              {formDataError.emailError != "" && (
+                <div className="text-red-500 text-sm">{formDataError.emailError}</div>
+              )}
             </div>
             <div className="grid gap-3">
               <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={formData.password}
-                onChange={(e) => setFormData({...formData, password: e.target.value})}
-                required
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword.password ? "text" : "password"}
+                  value={formData.password}
+                  onChange={(e) => setFormData({...formData, password: e.target.value})}
+                  required
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setShowPassword((prev) => ({...prev, password: !prev.password}))}
+                  className="absolute right-2 top-1/2 h-8 w-8 -translate-y-1/2 p-0"
+                >
+                  {showPassword.password ? (
+                    <EyeOff className="h-4 w-4" aria-hidden="true" />
+                  ) : (
+                    <Eye className="h-4 w-4" aria-hidden="true" />
+                  )}
+                </Button>
+              </div>
+              
+              {(formDataError.passwordError != "" && formData.password != formData.passwordConfirm) && (
+                <div className="text-red-500 text-sm">{formDataError.passwordError}</div>
+              )}
             </div>
             <div className="grid gap-3">
               <Label htmlFor="confirm-password">Confirm Password</Label>
-              <Input
-                id="confirm-password"
-                type="password"
-                value={formData.passwordConfirm}
-                onChange={(e) => setFormData({...formData, passwordConfirm: e.target.value})}
-                required
-              />
+              <div className="relative">
+                <Input
+                  id="confirm-password"
+                  type={showPassword.passwordConfirm ? "text" : "password"}
+                  value={formData.passwordConfirm}
+                  onChange={(e) => setFormData({...formData, passwordConfirm: e.target.value})}
+                  required
+                />
+                <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setShowPassword((prev) => ({...prev, passwordConfirm: !prev.passwordConfirm}))}
+                    className="absolute right-2 top-1/2 h-8 w-8 -translate-y-1/2 p-0"
+                  >
+                    {showPassword.passwordConfirm ? (
+                      <EyeOff className="h-4 w-4" aria-hidden="true" />
+                    ) : (
+                      <Eye className="h-4 w-4" aria-hidden="true" />
+                    )}
+                </Button>
+              </div>
+              {formDataError.passwordConfirmError != "" && (
+                <div className="text-red-500 text-sm">{formDataError.passwordConfirmError}</div>
+              )}
             </div>
-            <Button type="submit" className="w-full cursor-pointer">
-              Register
+            <Button type="submit" className="w-full cursor-pointer" disabled={isLoading}>
+              {isLoading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : "Create Account"}
             </Button>
           </div>
           <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
@@ -95,16 +158,7 @@ export function SignUpForm({
               Or
             </span>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Button variant="outline" type="button" className="w-full">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path
-                  d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"
-                  fill="currentColor"
-                />
-              </svg>
-              Continue with Apple
-            </Button>
+          <div className="grid gap-4 sm:grid-cols-1">
             <Button variant="outline" type="button" className="w-full">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path
