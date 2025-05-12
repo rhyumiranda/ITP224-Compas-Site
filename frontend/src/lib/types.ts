@@ -8,3 +8,13 @@ export interface SignUpFormProps {
   password: string
   passwordConfirm: string
 }
+
+export interface SignUpFormErrorProps {
+  emailError: string | null
+  passwordError: string | null
+  passwordConfirmError: string | null
+}
+
+export interface ForgotPasswordFormProps {
+  email: string
+}
