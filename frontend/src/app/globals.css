@@ -6,6 +6,10 @@
   margin-inline: auto;
 }
 
+.wrapper-height {
+  min-height: calc(100vh - 10vh);
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
