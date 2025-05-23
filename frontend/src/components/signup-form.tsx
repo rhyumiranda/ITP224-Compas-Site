@@ -1,7 +1,7 @@
 "use client"
 
 import { Compass } from "lucide-react"
-
+import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,11 +10,15 @@ import { signupSchema } from "@/schemas/signupSchema"
 import { useState } from "react"
 import { SignUpFormProps, SignUpFormErrorProps } from "@/lib/types"
 import { EyeOff, Eye, LoaderCircle } from "lucide-react"
+import axios from "axios"
+import { useRouter } from "next/navigation"
 
 export function SignUpForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+
+  const router = useRouter();
 
   const [formData, setFormData] = useState<SignUpFormProps>({
     email: "",
@@ -35,7 +39,7 @@ export function SignUpForm({
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true);
 
@@ -50,11 +54,19 @@ export function SignUpForm({
         passwordError: formattedErrors.password?._errors?.join(" ") || "",
         passwordConfirmError: formattedErrors.passwordConfirm?._errors?.join(" ") || "",
       }));
+
+      setIsLoading(false);
+      return;
     }
 
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 2000)
+    axios.post("http://localhost/api/index.php", formData);
+    setTimeout(async () => {
+      toast("Account has has been created successfully", {
+          description: "You may now login to your account"
+      }) 
+      await setIsLoading(false)
+      await router.push("/auth/login")
+    }, 1000)
   }
 
   return (

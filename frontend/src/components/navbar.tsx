@@ -2,6 +2,8 @@
 import { Button } from "./ui/button"
 import Link from "next/link"
 import { useState } from "react"
+import Image from "next/image"
+import { ModeToggle } from "./mode-toggle"
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,13 +14,17 @@ export default function Navbar() {
   
   return (
     <>
-      <nav className="wrapper md:flex justify-between items-center py-4 hidden">
-        <h1 className="font-black text-lg">Compas.</h1>
-        <ul className="flex gap-3">
-          <li><Link href='/destinations'>Destinations</Link></li>
+      <nav className="wrapper md:grid md:grid-cols-3 justify-between items-center py-4 hidden">
+        
+        <Link href="/dashboard"><Image src="/logo.gif" width={48} height={48} alt="logo" className="w-24"/></Link>
+        <ul className="flex gap-8 flex-1/2">
+          <li><Link href='/'>Home</Link></li>
           <li><Link href='/travel-logs'>Travel Logs</Link></li>
+          <li><Link href='#packages'>Trip Planner</Link></li>
+          <li><Link href='#adventures'>Destinations</Link></li>
         </ul>
-        <div className="flex gap-3">
+        <div className="flex gap-3 justify-end">
+          <ModeToggle/>
           <Link href='/auth/login'>
             <Button className="cursor-pointer">
               Sign In
@@ -32,7 +38,7 @@ export default function Navbar() {
         </div>
       </nav>
       <nav className="wrapper md:hidden flex justify-between items-center py-4">
-        <h1 className="font-black text-lg">Compas.</h1>
+        <Link href="/dashboard"><Image src="/logo.gif" width={48} height={48} alt="logo" className="w-24"/></Link>
         
         {/* Hamburger Button */}
         <button 
@@ -52,10 +58,13 @@ export default function Navbar() {
           } flex flex-col pt-20 px-6`}
         >
           <ul className="flex flex-col gap-6 mb-8">
-            <li><Link href='/destinations' className="text-lg" onClick={toggleMenu}>Destinations</Link></li>
-            <li><Link href='/travel-logs' className="text-lg" onClick={toggleMenu}>Travel Logs</Link></li>
+            <li><Link href='/'>Home</Link></li>
+            <li><Link href='/travel-logs'>Travel Logs</Link></li>
+            <li><Link href='#packages'>Trip Planner</Link></li>
+            <li><Link href='#adventures'>Destinations</Link></li>
           </ul>
           <div className="flex flex-col gap-3">
+            <ModeToggle/>
             <Link href='/auth/login'>
               <Button className="cursor-pointer" onClick={toggleMenu}>
                 Sign In
