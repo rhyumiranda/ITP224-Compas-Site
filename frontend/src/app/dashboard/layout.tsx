@@ -1,10 +1,10 @@
 import React from 'react'
-import Navbar from '@/components/navbar'
+import DashboardNav from '@/components/dashboard-nav'
 
 export default function layout( {children} : {children: React.ReactNode}) {
   return (
     <>
-      <Navbar />
+      <DashboardNav/>
       {children}
     </>
   )
